@@ -16,7 +16,19 @@ import sys
 import requests
 from pyspark.sql import SparkSession
 
-
+def connect():
+    END_POINT ='https://q652q8ycce.execute-api.us-east-2.amazonaws.com/dev'
+    
+    get_response = requests.get(END_POINT)
+    
+    print(get_response)
+    print(get_response.content)
+    
+    post_response = requests.post(END_POINT)
+    
+    print(post_response)
+    print(post_response.content)
+    
 if __name__ == "__main__":
     """
         Usage: wordcount [destination path]
@@ -35,23 +47,11 @@ if __name__ == "__main__":
         sys.exit(1)
 
     region = os.getenv("AWS_REGION")
-    text_file = spark.sparkContext.textFile("s3://" + region  + ".elasticmapreduce/emr-containers/samples/wordcount/input-small")
-    counts = text_file.flatMap(lambda line: line.split(" ")).map(lambda word: (word, 1)).reduceByKey(lambda a, b: a + b)
-    counts.toDF().write.mode("overwrite").csv(output_path)
+    text_file = spark.sparkContext.textFile("s3://" + region  + ".khanh-bucket/wordcount/input-small")
+    
+    
+    text_file.flatMap(lambda line: line.split(" "))
+            .foreach(connect)
 
-    print("WordCount job completed successfully. Refer output at S3 path: " + output_path)
-    
-
-    END_POINT ='https://q652q8ycce.execute-api.us-east-2.amazonaws.com/dev'
-    
-    get_response = requests.get(END_POINT)
-    
-    print(get_response)
-    print(get_response.content)
-    
-    post_response = requests.post(END_POINT)
-    
-    print(post_response)
-    print(post_response.content)
 
     spark.stop()
